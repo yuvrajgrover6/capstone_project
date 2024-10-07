@@ -6,6 +6,17 @@ export default {
   ],
   theme: {
     extend: {},
+    container: {
+      center: true, // Ensure the container is centered
+      padding: "1rem", // Add some padding to the container
+    },
+    screens: {
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+    },
   },
   plugins: [],
 };

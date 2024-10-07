@@ -2,22 +2,35 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { LoginModal } from "../components/LoginModal";
 import { SignupModal } from "../components/SignupModal";
+import Modal from "../components/Modal";
+import SignupForm from "../components/SignupForm";
 
 const WelcomePage: React.FC = () => {
   const [isLoginOpen, setLoginOpen] = useState(false);
   const [isSignupOpen, setSignupOpen] = useState(false);
-  const [isFunderSignup, setFunderSignup] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFunderSignup, setIsFunderSignup] = useState(false);
 
-  const openFunderSignup = () => {
-    setFunderSignup(true);
-    setSignupOpen(true);
+  const handleFunderSignupClick = () => {
+    setIsFunderSignup(true);
+    setIsModalOpen(true);
   };
-  const openSignup = () => {
-    setFunderSignup(false);
-    setSignupOpen(true);
+
+  const handleArtistSignupClick = () => {
+    setIsFunderSignup(false);
+    setIsModalOpen(true);
   };
+
+  // const openFunderSignup = () => {
+  //   setFunderSignup(true);
+  //   setSignupOpen(true);
+  // };
+  // const openSignup = () => {
+  //   setFunderSignup(false);
+  //   setSignupOpen(true);
+  // };
   return (
-    <div className="min-h-screen w-full bg-gradient-to-r from-purple-400 to-indigo-500 text-white font-sans">
+    <div className="min-h-screen w-screen w-full bg-gradient-to-r from-purple-400 to-indigo-500 text-white font-sans">
       {/* Header */}
       <header className="flex justify-between items-center py-4 px-8">
         <h1 className="text-3xl font-bold">CreativeHub</h1>
@@ -49,7 +62,7 @@ const WelcomePage: React.FC = () => {
         </p>
 
         <div className="flex space-x-4 mt-6">
-          <Link
+          {/* <Link
             to="/explore"
             className="bg-white text-purple-700 font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-gray-100 transition"
           >
@@ -61,7 +74,22 @@ const WelcomePage: React.FC = () => {
             className="bg-indigo-600 font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-indigo-700 transition"
           >
             Join as Funder
-          </button>
+          </button> */}
+          <div className="mt-8 space-x-4">
+            <button
+              onClick={handleFunderSignupClick}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+            >
+              Join as Funder
+            </button>
+
+            <button
+              onClick={handleArtistSignupClick}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg"
+            >
+              Join as Artist
+            </button>
+          </div>
         </div>
       </main>
 
@@ -95,6 +123,13 @@ const WelcomePage: React.FC = () => {
           isFunderSignup={isFunderSignup}
         />
       )}
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <SignupForm
+          type={isFunderSignup ? "user" : "artist"}
+          onClose={() => setIsModalOpen(false)}
+        />
+      </Modal>
 
       {/* Footer */}
       <footer className="bg-gray-900 py-8 text-center text-gray-400">

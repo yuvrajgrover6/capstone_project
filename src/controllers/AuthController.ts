@@ -7,7 +7,13 @@ export function useAuth() {
   const [user, setUser] = useState<AuthResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSignup = async (userData: object) => {
+  const handleSignup = async (userData: {
+    name: string;
+    email: string;
+    password: string;
+    type: string;
+    photoUrl?: string;
+  }) => {
     try {
       const response = await signup(userData);
       setUser(response);
@@ -17,7 +23,10 @@ export function useAuth() {
     }
   };
 
-  const handleLogin = async (credentials: object) => {
+  const handleLogin = async (credentials: {
+    email: string;
+    password: string;
+  }) => {
     try {
       const response = await login(credentials);
       setUser(response);
