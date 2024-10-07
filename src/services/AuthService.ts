@@ -46,7 +46,9 @@ export const signup = async (userData: {
   photoUrl?: string;
 }) => {
   try {
-    const response = await axios.post(`${API_URL}/signup`, userData);
+    const user = userData;
+    const type = user.type;
+    const response = await axios.post(`${API_URL}/signup`, { user, type });
     console.log("response", response);
     return response.data; // Return the response data (e.g., token, user info)
   } catch (error: any) {

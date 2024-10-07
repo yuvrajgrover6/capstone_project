@@ -1,6 +1,11 @@
-export interface User {
-  id: string;
+interface IUserModel {
+  id: number;
   name: string;
   email: string;
-  role: string;
+  password: string;
+  photoUrl: string;
+  createdAt: Date;
+  type: string;
 }
+
+export type { IUserModel };
