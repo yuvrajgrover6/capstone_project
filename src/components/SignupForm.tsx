@@ -6,7 +6,9 @@ interface SignupFormProps {
   onClose: () => void;
 }
 
+// Add the SignupForm component
 const SignupForm: React.FC<SignupFormProps> = ({ type, onClose }) => {
+  // Add state for form data, loading state, and error message
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,6 +18,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ type, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Add a function to handle form changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -23,6 +26,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ type, onClose }) => {
     });
   };
 
+  // Add a function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

@@ -18,15 +18,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.error("Tihs iks a test");
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
+      console.log("formData", formData);
       await login(formData); // Call login service
+
       alert("Logged in successfully!");
       onClose();
     } catch (error: any) {
+      alert("Failed to log in");
       setError(error.message);
     } finally {
       setLoading(false);
