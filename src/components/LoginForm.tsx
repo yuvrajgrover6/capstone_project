@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { login } from "../services/AuthService";
+import { useUser } from "../context/UserContext";
 
 interface LoginFormProps {
   onClose: () => void;
@@ -9,6 +11,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { setUser } = useUser(); // Use setUser from UserContext
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -23,9 +27,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
     setError("");
 
     try {
-      await login(formData); // Call login service
-      alert("Logged in successfully!");
-      onClose();
+      const response = await login(formData); // Call login service and get user data
+      console.log("response", response);
+      // Set user data and token in context
+      setUser({
+        name: response.body.user.name,
+        email: response.body.user.email,
+        profilePicUrl: response.body.user.photoUrl || "/default-profile.jpg", // Use a default if photoUrl is empty
+        role: response.body.user.type,
+        id: response.body.user._id,
+        token: response.body.token,
+      });
+
+      onClose(); // Close the login modal
+      navigate("/home"); // Redirect to the home page
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -36,7 +51,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-xl font-semibold text-center mb-4">Login</h2>
-
       <div>
         <label className="block text-sm font-medium text-gray-700">Email</label>
         <input
@@ -49,7 +63,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
           required
         />
       </div>
-
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Password
@@ -64,7 +77,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
           required
         />
       </div>
-
       <button
         type="submit"
         className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
@@ -72,7 +84,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
       >
         {loading ? "Logging in..." : "Login"}
       </button>
-
       {error && <p className="text-red-500 text-center">{error}</p>}
     </form>
   );

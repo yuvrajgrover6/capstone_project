@@ -1,11 +1,13 @@
 // src/components/Post.tsx
 import React, { useState } from "react";
+import { addLike } from "../services/LikeService";
 
 interface PostProps {
   artistName: string;
   artistProfile: string;
   artworkUrl: string;
   description: string;
+  postId: any;
 }
 
 export const Post: React.FC<PostProps> = ({
@@ -13,13 +15,19 @@ export const Post: React.FC<PostProps> = ({
   artistProfile,
   artworkUrl,
   description,
+  postId,
 }) => {
   const [likes, setLikes] = useState(0);
   const [comments, setComments] = useState<string[]>([]);
   const [newComment, setNewComment] = useState("");
 
-  const handleLike = () => {
-    setLikes(likes + 1);
+  const handleLike = async () => {
+    try {
+      await addLike(postId); // Add `postId` as a prop in your Post component
+      setLikes(likes + 1);
+    } catch (error) {
+      alert("Failed to like the post");
+    }
   };
 
   const handleAddComment = () => {
