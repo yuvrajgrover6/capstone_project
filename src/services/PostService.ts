@@ -6,7 +6,7 @@ interface PostData {
   title: string;
   description: string;
   body: string;
-  id: any;
+  id: string;
 }
 
 // PostService for managing post-related API requests
@@ -20,10 +20,13 @@ export const PostService = {
     formData.append("body", postData.body);
     formData.append("artistId", postData.id);
     const data = {
-      title: postData.title,
-      body: postData.body,
-      artistId: postData.id,
+      post: {
+        title: postData.title,
+        body: postData.body,
+        artistId: postData.id,
+      },
     };
+    console.log("reqdata", data);
     try {
       const response = await axios.post(`${API_URL}/createPost`, data, {
         headers: {
