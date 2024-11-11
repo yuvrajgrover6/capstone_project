@@ -1,12 +1,18 @@
+// src/components/CreatePostModal.tsx
 import React, { useState } from "react";
 import { PostService } from "../services/PostService";
 
 interface CreatePostModalProps {
   onClose: () => void;
+  onPostCreated: () => void; // New callback function
   user: any;
 }
 
-const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, user }) => {
+const CreatePostModal: React.FC<CreatePostModalProps> = ({
+  onClose,
+  onPostCreated,
+  user,
+}) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [body, setBody] = useState("");
@@ -35,12 +41,14 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, user }) => {
     try {
       const postData = {
         title,
-        description,
         body,
-        id: user.id,
+        artistId: user.id,
       };
-      const createdPost = await PostService.createPost(postData, user.token); // Use PostService to create post
+      const createdPost = await PostService.createPost(postData, user.token);
       console.log("Post created:", createdPost);
+
+      // Trigger the callback to refetch posts
+      onPostCreated();
       onClose();
     } catch (error) {
       console.error("Error creating post:", error);

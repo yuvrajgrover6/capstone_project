@@ -1,5 +1,6 @@
+// src/components/Sidebar.tsx
 import React, { useState } from "react";
-import CreatePostModal from "./CreatePostModal"; // Import the CreatePostModal component
+import CreatePostModal from "./CreatePostModal";
 
 interface SidebarProps {
   user: {
@@ -7,11 +8,12 @@ interface SidebarProps {
     profilePicUrl: string;
     role: string;
     id: string;
+    token: string;
   } | null;
+  onPostCreated: () => void; // Accept an onPostCreated callback prop
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ user }) => {
-  console.log("sidebar", user);
+export const Sidebar: React.FC<SidebarProps> = ({ user, onPostCreated }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCreatePostClick = () => {
@@ -30,7 +32,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ user }) => {
         <h2 className="text-xl text-gray-500 font-semibold mt-2">
           {user?.name || "Guest"}
         </h2>
-        {/* <p className="text-gray-500">{user?.role || "Role not available"}</p> */}
       </div>
 
       {/* Sidebar Links */}
@@ -48,7 +49,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ user }) => {
 
       {/* Create Post Modal */}
       {isModalOpen && (
-        <CreatePostModal onClose={() => setIsModalOpen(false)} user={user} />
+        <CreatePostModal
+          onClose={() => setIsModalOpen(false)}
+          user={user}
+          onPostCreated={onPostCreated} // Pass the callback here
+        />
       )}
     </aside>
   );

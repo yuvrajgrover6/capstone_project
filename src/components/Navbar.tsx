@@ -1,24 +1,23 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext"; // Import user context for user data
+import { useUser } from "../context/UserContext";
+import { AiOutlineHome, AiOutlineBell, AiOutlineUser } from "react-icons/ai";
+import { FaNetworkWired } from "react-icons/fa";
 
 export const Navbar: React.FC = () => {
-  const { user, setUser } = useUser(); // Get user data and setUser from UserContext
+  const { user, setUser } = useUser();
   const navigate = useNavigate();
 
-  // Logout function
   const handleLogout = () => {
-    setUser(null); // Clear user data in context
-    localStorage.removeItem("token"); // Optional: remove token from local storage
-    navigate("/"); // Redirect to welcome page
+    setUser(null);
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   return (
     <nav className="bg-white border-b shadow-md fixed w-full top-0 z-10">
       <div className="max-w-screen-lg mx-auto px-4 py-2 flex justify-between items-center">
-        {/* Left Section: Logo and Search Bar */}
         <div className="flex items-center space-x-4">
-          {/* <img src="/logo.png" alt="CreativeHub" className="h-10" /> */}
           <h1 className="text-2xl font-extrabold tracking-wide bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 bg-clip-text text-transparent animate-gradient-slide">
             CreativeHub
           </h1>
@@ -29,17 +28,17 @@ export const Navbar: React.FC = () => {
           />
         </div>
 
-        {/* Right Section: Navigation Links, Username, and Profile Picture */}
         <div className="flex items-center space-x-4">
-          <button className="text-gray-600 hover:text-gray-900">Home</button>
-          <button className="text-gray-600 hover:text-gray-900">
-            My Network
-          </button>
-          <button className="text-gray-600 hover:text-gray-900">
-            Notifications
-          </button>
+          <span className="text-gray-600 hover:text-gray-900">
+            <AiOutlineHome size={24} />
+          </span>
+          <span className="text-gray-600 hover:text-gray-900">
+            <FaNetworkWired size={24} />
+          </span>
+          <span className="text-gray-600 hover:text-gray-900">
+            <AiOutlineBell size={24} />
+          </span>
 
-          {/* User Info Section */}
           {user ? (
             <div className="flex items-center space-x-2">
               <span className="text-gray-600 font-semibold">{user.name}</span>

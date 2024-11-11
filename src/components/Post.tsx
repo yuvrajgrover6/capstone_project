@@ -1,101 +1,127 @@
 // src/components/Post.tsx
-import React, { useState } from "react";
-import { addLike } from "../services/LikeService";
+import React, { useState, useEffect } from "react";
+import { PostService } from "../services/PostService";
 
 interface PostProps {
+  postId: string;
   artistName: string;
   artistProfile: string;
   artworkUrl: string;
   description: string;
-  postId: any;
+  likeCount: number;
+  commentCount: number;
+  token: string;
+  userID: string;
+  id: string;
+  comments: CommentData[]; // Initial comments prop
+}
+
+interface CommentData {
+  _id: string;
+  body: string;
+  createdAt: string;
+  userId: string;
 }
 
 export const Post: React.FC<PostProps> = ({
+  postId,
   artistName,
   artistProfile,
   artworkUrl,
   description,
-  postId,
+  likeCount,
+  commentCount,
+  token,
+  userID,
+  id,
+  comments,
 }) => {
-  const [likes, setLikes] = useState(0);
-  const [comments, setComments] = useState<string[]>([]);
+  const [likes, setLikes] = useState(likeCount);
+  const [postComments, setPostComments] = useState<CommentData[]>(comments);
   const [newComment, setNewComment] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLike = async () => {
+  // Fetch comments from API
+  const fetchComments = async () => {
     try {
-      await addLike(postId); // Add `postId` as a prop in your Post component
-      setLikes(likes + 1);
-    } catch (error) {
-      alert("Failed to like the post");
+      const data = await PostService.getComments(postId, token);
+      setPostComments(data);
+    } catch (err) {
+      setError("Failed to load comments");
     }
   };
 
-  const handleAddComment = () => {
-    if (newComment) {
-      setComments([...comments, newComment]);
-      setNewComment("");
+  // Fetch comments initially when component mounts
+  useEffect(() => {
+    fetchComments();
+  }, [postId]);
+
+  const handleLike = async () => {
+    try {
+      await PostService.addLike(postId, userID, token, id);
+      setLikes(likes + 1);
+    } catch (error) {
+      setError("Failed to like post");
+    }
+  };
+
+  const handleComment = async () => {
+    if (newComment.trim()) {
+      try {
+        await PostService.addComment(id, postId, userID, newComment, token);
+        setNewComment("");
+        // Fetch the latest comments from the API after posting
+        fetchComments();
+      } catch (error) {
+        setError("Failed to add comment");
+      }
     }
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      {/* Artist Info */}
-      <div className="flex items-center mb-4">
-        <img
-          src={artistProfile}
-          alt={artistName}
-          className="w-12 h-12 rounded-full mr-3"
-        />
-        <div>
-          <h4 className="font-semibold">{artistName}</h4>
-          <p className="text-gray-500">Artist</p>
-        </div>
-      </div>
-
-      {/* Artwork */}
-      <img
-        src={artworkUrl}
-        alt="Artwork"
-        className="w-full h-64 object-cover rounded-lg mb-4"
-      />
-
-      {/* Description */}
-      <p className="text-gray-700 mb-4">{description}</p>
-
-      {/* Interaction Buttons */}
-      <div className="flex items-center space-x-6 mb-4">
-        <button onClick={handleLike} className="text-red-500">
-          ❤️ {likes} Likes
+    <div className="post bg-white p-4 shadow rounded-lg">
+      <h2 className="text-xl text-gray-500 font-semibold mt-2">{artistName}</h2>
+      <p className="text-lg mb-4">{description}</p>
+      <div className="flex items-center space-x-4 mb-4">
+        <button onClick={handleLike} className="text-blue-500">
+          Like ({likes})
         </button>
-        <button className="text-blue-500">💬 Comment</button>
-        <button className="text-green-500">💰 Fund</button>
+        <button className="text-green-500">Fund</button>
       </div>
-
-      {/* Comments */}
-      <div className="space-y-2">
-        {comments.map((comment, index) => (
-          <p key={index} className="text-gray-600">
-            {comment}
-          </p>
-        ))}
-      </div>
-
-      {/* Add Comment */}
-      <div className="flex mt-4">
+      <div className="mt-4">
         <input
           type="text"
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add a comment..."
-          className="border rounded-lg flex-grow p-2 mr-2"
+          placeholder="Add a comment"
+          className="w-full border p-2 rounded mb-2"
         />
         <button
-          onClick={handleAddComment}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+          onClick={handleComment}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
         >
-          Post
+          Comment
         </button>
       </div>
+
+      {/* Display comments */}
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold">Comments</h3>
+        {postComments.length > 0 ? (
+          postComments.map((comment) => (
+            <div key={comment._id} className="border-t pt-2 mt-2">
+              <p className="text-gray-700">{comment.body}</p>
+              <p className="text-xs text-gray-500">
+                {new Date(comment.createdAt).toLocaleString()}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500">No comments yet.</p>
+        )}
+      </div>
+
+      {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
   );
 };
