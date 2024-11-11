@@ -7,11 +7,9 @@ interface SignupFormProps {
   openLogin: () => void; // Function to open the login modal
 }
 
-const SignupForm: React.FC<SignupFormProps> = ({
-  type,
-  onClose,
-  openLogin,
-}) => {
+// Add the SignupForm component
+const SignupForm: React.FC<SignupFormProps> = ({ type, onClose }) => {
+  // Add state for form data, loading state, and error message
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -22,6 +20,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false); // Success state for the popup
 
+  // Add a function to handle form changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -29,6 +28,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
     });
   };
 
+  // Add a function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

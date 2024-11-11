@@ -22,26 +22,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.error("Tihs iks a test");
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const response = await login(formData); // Call login service and get user data
-      console.log("response", response);
-      // Set user data and token in context
-      setUser({
-        name: response.body.user.name,
-        email: response.body.user.email,
-        profilePicUrl: response.body.user.photoUrl || "/default-profile.jpg", // Use a default if photoUrl is empty
-        role: response.body.user.type,
-        id: response.body.user._id,
-        token: response.body.token,
-      });
+      console.log("formData", formData);
+      await login(formData); // Call login service
 
-      onClose(); // Close the login modal
-      navigate("/home"); // Redirect to the home page
+      alert("Logged in successfully!");
+      onClose();
     } catch (error: any) {
+      alert("Failed to log in");
       setError(error.message);
     } finally {
       setLoading(false);
