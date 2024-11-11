@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/auth/artists";
+const API_URL = "http://localhost:3000/auth/artists";
 
 // Fetch all artists
 export const fetchArtists = async () => {

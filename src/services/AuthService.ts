@@ -35,7 +35,7 @@ import axios from "axios";
 //   return response.json();
 // }
 
-const API_URL = "http://localhost:8080/auth"; // Base URL for your API
+const API_URL = "http://localhost:3000/auth"; // Base URL for your API
 
 // Function to handle user signup
 export const signup = async (userData: {
@@ -62,10 +62,7 @@ export const login = async (credentials: {
   password: string;
 }) => {
   try {
-    console.log("credentials,", credentials);
-    console.log("API_URL", API_URL);
     const response = await axios.post(`${API_URL}/login`, credentials);
-    console.info("response", response);
     return response.data; // Return token, user info, etc.
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Login failed");

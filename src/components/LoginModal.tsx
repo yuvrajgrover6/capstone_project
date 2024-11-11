@@ -1,30 +1,14 @@
 // src/components/LoginModal.tsx
 import React, { useState } from "react";
-import { login } from "../services/AuthService";
 
 export const LoginModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const [userType, setUserType] = useState<"artist" | "user">("artist");
+  const [userType, setUserType] = useState<"artist" | "funder">("artist");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const [formData, setFormData] = useState({ email: "", password: "" });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleLogin = async () => {
-    try {
-      console.log("formData", formData);
-      await login(formData); // Call login service
-
-      alert("Logged in successfully!");
-      onClose();
-    } catch (error: any) {
-      alert("Failed to log in");
-    } finally {
-    }
+  const handleLogin = () => {
+    // Add login logic here
+    console.log(`Login as ${userType} with`, email, password);
   };
 
   return (
@@ -52,9 +36,9 @@ export const LoginModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             Artist
           </button>
           <button
-            onClick={() => setUserType("user")}
+            onClick={() => setUserType("funder")}
             className={`px-4 py-2 mx-2 ${
-              userType === "user"
+              userType === "funder"
                 ? "bg-indigo-600 text-white"
                 : "bg-gray-200 text-gray-700"
             }`}
@@ -65,19 +49,17 @@ export const LoginModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
         <input
           type="email"
-          name="email"
           placeholder="Email"
           className="w-full p-3 mb-4 border rounded"
-          value={formData.email}
-          onChange={handleChange}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
-          name="password"
           placeholder="Password"
           className="w-full p-3 mb-6 border rounded"
-          value={formData.password}
-          onChange={handleChange}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <button
           onClick={handleLogin}

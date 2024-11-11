@@ -29,7 +29,6 @@ export function useAuth() {
   }) => {
     try {
       const response = await login(credentials);
-      console.log(response);
       setUser(response);
       localStorage.setItem("authToken", response.token);
     } catch (e: any) {

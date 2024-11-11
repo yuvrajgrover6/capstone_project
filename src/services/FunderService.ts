@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/donation";
+const API_URL = "http://localhost:3000/donation";
 
 // Fund an artwork
 export const fundArtwork = async (fundData: {
