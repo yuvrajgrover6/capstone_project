@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import WelcomePage from "./pages/WelcomePage";
 import HomePage from "./pages/HomePage";
 import { UserProvider } from "./context/UserContext";
+import { UserProfile } from "./components/UserProfile";
 // import { getToken } from "./services/AuthService";
 
 function App() {
@@ -13,6 +14,8 @@ function App() {
         <Routes>
           <Route path="/" element={<WelcomePage />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/profile/:userId" element={<UserProfile />} />
+
           {/* <Route
           path="/feed"
           element={isAuthenticated ? <Feed /> : <Navigate to="/" />}

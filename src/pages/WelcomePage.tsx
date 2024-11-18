@@ -154,7 +154,7 @@ const WelcomePage: React.FC = () => {
       </Modal>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <SignupForm
-          type={isFunderSignup ? "funder" : "artist"}
+          type={isFunderSignup ? "user" : "artist"}
           onClose={() => setIsModalOpen(false)}
           openLogin={openLogin}
         />

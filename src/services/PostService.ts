@@ -137,9 +137,15 @@ export const PostService = {
   },
 
   // Get all comments for a specific post
-  async getComments(postId: string, token: string) {
+  async getComments(
+    postId: string,
+    token: string,
+    pageNumber = 1,
+    pageSize = 10
+  ) {
     try {
       const response = await axios.get(`${API_URL}/getComments/${postId}`, {
+        params: { pageNumber, pageSize }, // Add query parameters
         headers: {
           "Content-Type": "application/json",
           Authorization: token,

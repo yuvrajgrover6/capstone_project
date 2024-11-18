@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { signup } from "../services/AuthService"; // Your API service
 
 interface SignupFormProps {
-  type: "artist" | "funder" | "user"; // Add "user" here if this is required
+  type: string; // Add "user" here if this is required
   onClose: () => void; // Function to close the modal
   openLogin: () => void; // Function to open the login modal
 }
@@ -52,6 +52,8 @@ const SignupForm: React.FC<SignupFormProps> = ({
     openLogin(); // Open the login modal
   };
 
+  console.log("type", type);
+
   return (
     <>
       {success ? (
@@ -74,7 +76,7 @@ const SignupForm: React.FC<SignupFormProps> = ({
         // Signup Form
         <form onSubmit={handleSubmit} className="space-y-4">
           <h2 className="text-xl font-semibold text-center mb-4">
-            Sign up as {type === "artist" ? "Artist" : "Funder"}
+            Sign up as {type === "artist" ? "Artist" : "User"}
           </h2>
 
           <div>
