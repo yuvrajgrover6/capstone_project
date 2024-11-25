@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import { AiOutlineHome, AiOutlineBell, AiOutlineUser } from "react-icons/ai";
-import { FaNetworkWired } from "react-icons/fa";
+import { AiOutlineHome, AiOutlineBell } from "react-icons/ai";
+import { FaNetworkWired, FaUserCircle } from "react-icons/fa";
 
 export const Navbar: React.FC = () => {
   const { user, setUser } = useUser();
@@ -42,11 +42,20 @@ export const Navbar: React.FC = () => {
           {user ? (
             <div className="flex items-center space-x-2">
               <span className="text-gray-600 font-semibold">{user.name}</span>
-              <img
-                src={user.profilePicUrl || "/default-profile.jpg"}
-                alt="User profile"
-                className="h-10 w-10 rounded-full object-cover"
-              />
+              <div className="relative inline-block">
+                {/* Profile Picture with Ring */}
+                <div className="relative h-10 w-15 rounded-full bg-gradient-to-r from-purple-500 via-blue-500 to-orange-500 p-[2px] flex items-center justify-center">
+                  {user?.profilePicUrl !== "/default-profile.jpg" ? (
+                    <img
+                      src={user?.profilePicUrl}
+                      alt="User Profile"
+                      className="h-full w-full rounded-full object-cover bg-white"
+                    />
+                  ) : (
+                    <FaUserCircle className="text-gray-300 h-full w-full rounded-full bg-white" />
+                  )}
+                </div>
+              </div>
               <button
                 onClick={handleLogout}
                 className="text-red-500 hover:text-red-700 text-sm font-medium ml-2"

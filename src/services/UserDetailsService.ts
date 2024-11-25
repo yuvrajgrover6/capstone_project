@@ -6,12 +6,19 @@ const API_URL = "http://localhost:3000/user/";
 
 export const UserService = {
   // Fetch all posts with pagination and authentication
-  async getUserDetails(artistId: string, token: string) {
+  async getUserDetails(userId: string, token: string) {
     try {
-      const response = await axios.get(`${API_URL}user-details/${artistId}`, {
-        headers: { Authorization: token },
-      });
-      return response.data.body.posts;
+      const response = await axios.post(
+        `${API_URL}userDetails/${userId}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+      return response.data.body.user;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Failed to load posts");
     }

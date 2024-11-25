@@ -24,6 +24,8 @@ interface CommentData {
   userId: string;
 }
 
+interface LikeData {}
+
 export const Post: React.FC<PostProps> = ({
   postId,
   artistName,
@@ -40,6 +42,8 @@ export const Post: React.FC<PostProps> = ({
   const [likes, setLikes] = useState(likeCount);
   const [isLiked, setIsLiked] = useState(false);
   const [postComments, setPostComments] = useState<CommentData[]>(comments);
+  const [likeDetails, setlikeDetails] = useState<LikeData[]>(comments);
+
   const [newComment, setNewComment] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showComments, setShowComments] = useState(false); // State for toggling comment visibility
@@ -58,24 +62,44 @@ export const Post: React.FC<PostProps> = ({
       setError("Failed to load comments");
     }
   };
+  // Fetch Likes details from API
+  const getAllLikes = async (pageNumber = 1, pageSize = 10) => {
+    try {
+      const data = await PostService.getAllLikes(
+        pageNumber,
+        pageSize,
+        postId,
+        token
+      );
+      setlikeDetails(data); // Update the state with fetched comments
+    } catch (err) {
+      setError("Failed to load comments");
+    }
+  };
 
   // Check if the user has already liked this post
-  useEffect(() => {
-    const checkLikedStatus = async () => {
-      try {
-        // const liked = await PostService.isPostLiked(postId, userID, token);
-        // setIsLiked(liked);
-      } catch {
-        setError("Failed to check like status");
-      }
-    };
-    checkLikedStatus();
-  }, [postId, userID, token]);
+
+  const checkLikedStatus = async (pageNumber = 1, pageSize = 10) => {
+    try {
+      const data = await PostService.getAllLikes(
+        pageNumber,
+        pageSize,
+        postId,
+        token
+      );
+      console.log("likw", data);
+
+      setIsLiked(data.isLikedByUser);
+    } catch {
+      setError("Failed to check like status");
+    }
+  };
 
   // Fetch comments initially when component mounts
   useEffect(() => {
     fetchComments(1, 10);
-  }, [postId]);
+    checkLikedStatus();
+  }, [postId, token]);
 
   const handleLikeToggle = async () => {
     try {
@@ -114,19 +138,25 @@ export const Post: React.FC<PostProps> = ({
       <p className="text-lg text-gray-500 mb-4">{description}</p>
       <div className="flex items-center space-x-4 mb-4">
         {/* Like Button */}
-        <button onClick={handleLikeToggle} className="text-red-500">
+        <span
+          onClick={handleLikeToggle}
+          className="cursor-pointer text-red-500"
+        >
           {isLiked ? <FaHeart /> : <FaRegHeart />} ({likes})
-        </button>
+        </span>
 
         {/* Comment Button */}
-        <button onClick={handleCommentToggle} className="text-blue-500">
+        <span
+          onClick={handleCommentToggle}
+          className="cursor-pointer text-blue-500"
+        >
           <FaComment /> ({commentCount})
-        </button>
+        </span>
 
         {/* Fund Button */}
-        <button className="text-green-500">
+        <span className="cursor-pointer text-green-500">
           <FaDonate /> Fund
-        </button>
+        </span>
       </div>
 
       {/* Display comment input and comments conditionally */}

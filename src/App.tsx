@@ -4,6 +4,7 @@ import WelcomePage from "./pages/WelcomePage";
 import HomePage from "./pages/HomePage";
 import { UserProvider } from "./context/UserContext";
 import { UserProfile } from "./components/UserProfile";
+import { Feed } from "./components/Feed";
 // import { getToken } from "./services/AuthService";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<WelcomePage />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/profile/:userId" element={<UserProfile />} />
+          <Route path="/feed" element={<Feed />} />
 
           {/* <Route
           path="/feed"

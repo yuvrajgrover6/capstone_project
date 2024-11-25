@@ -32,11 +32,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     e.preventDefault();
     setLoading(true);
 
-    // if (!image) {
-    //   alert("Please select an image");
-    //   setLoading(false);
-    //   return;
-    // }
+    if (!image) {
+      alert("Please select an image");
+      setLoading(false);
+      return;
+    }
 
     try {
       const postData = {
@@ -44,6 +44,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         body,
         artistId: user.id,
       };
+
       const createdPost = await PostService.createPost(postData, user.token);
       console.log("Post created:", createdPost);
 

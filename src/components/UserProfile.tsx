@@ -1,69 +1,176 @@
+import { useLocation, useNavigate } from "react-router-dom";
+import { Post } from "./Post";
 import React, { useEffect, useState } from "react";
-import { UserService } from "../services/UserDetailsService";
-import { useParams } from "react-router-dom";
-import { PostService } from "../services/PostService"; // If you want to fetch posts for this user
+import { PostService } from "../services/PostService";
 import { useUser } from "../context/UserContext";
+import { UserService } from "../services/UserDetailsService";
+
+interface UserDetails {
+  _id: string;
+  name: string;
+  profilePic: string;
+  followerCount: number;
+  followingCount: number;
+}
+
+interface PostData {
+  id: string;
+  title: string;
+  body: string;
+  artistId: string;
+  like_count: number;
+  comment_count: number;
+  artistName: string;
+  artistProfile: string;
+  artworkUrl: string;
+  description: string;
+  _id: string;
+}
+interface CommentsMap {
+  [postId: string]: CommentData[];
+}
+
+interface CommentData {
+  _id: string;
+  body: string;
+  createdAt: string;
+  userId: string;
+}
 
 export const UserProfile: React.FC = () => {
-  const { userId } = useParams<{ userId: string }>();
-  const [userDetails, setUserDetails] = useState<any>(null);
-  const [posts, setPosts] = useState<any[]>([]);
+  const [commentsMap, setCommentsMap] = useState<CommentsMap>({});
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useUser();
   const token = user?.token || "";
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const fetchUserDetails = async () => {
-    try {
-      const data = await UserService.getUserDetails(
-        userId ? userId : "",
-        token
-      ); // Fetch user details for this profile
-      setUserDetails(data.data);
-    } catch (error) {
-      setError("Failed to fetch user details");
-    }
+  const state = location.state as {
+    userDetails: UserDetails;
+    posts: PostData[];
   };
 
-  const fetchPosts = async () => {
-    try {
-      const data = await PostService.getPosts(1, 10, token); // Fetch posts for this user
-      setPosts(data);
-    } catch (error) {
-      setError("Failed to fetch posts");
-    }
-  };
+  const { userDetails, posts } = state;
 
   useEffect(() => {
-    fetchUserDetails();
-    fetchPosts();
-  }, [userId]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
 
-  if (error) {
-    return <p>{error}</p>;
-  }
+        // Fetch posts
+        const fetchedPosts: PostData[] = await PostService.getPosts(
+          1,
+          10,
+          token
+        );
 
-  if (!userDetails) {
-    return <p>Loading profile...</p>;
-  }
+        await fetchCommentsForPosts(fetchedPosts); // Fetch comments after posts
+      } catch (error) {
+        setError("Failed to load posts or user details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [token]);
+
+  const fetchCommentsForPosts = async (posts: PostData[]) => {
+    const newCommentsMap: CommentsMap = {};
+    for (const post of posts) {
+      try {
+        console.log(`Fetching comments for postId: ${post._id}`);
+        const comments = await PostService.getComments(post._id, token); // Fetch comments for each post
+        newCommentsMap[post._id] = comments;
+        console.log(`Comments for postId ${post._id}:`, comments);
+      } catch (error) {
+        console.error(`Failed to fetch comments for post ${post._id}`, error);
+      }
+    }
+    setCommentsMap(newCommentsMap);
+    console.log("Updated comments map:", newCommentsMap);
+  };
+  const handlePostClick = (post: PostData) => {
+    const filteredPosts = posts.filter((p) => p.artistId === post.artistId);
+    navigate("/feed", {
+      state: {
+        selectedPost: post,
+        filteredPosts,
+      },
+    });
+  };
+  const handleHomeClick = () => {
+    navigate("/home"); // Replace "/" with your actual home route
+  };
 
   return (
-    <div>
-      <img src={userDetails.profilePic} alt={userDetails.name} />
-      <h1>{userDetails.name}</h1>
-      <p>{userDetails.bio}</p>
-      <div>
-        <h2>Posts</h2>
-        {posts.length > 0 ? (
-          posts.map((post) => (
-            <div key={post.id}>
-              <h3>{post.title}</h3>
-              <p>{post.body}</p>
+    <div className="profile-page h-screen w-screen flex flex-col items-center bg-gray-100">
+      <header className="flex items-center justify-between w-full px-6 py-4 bg-white shadow-md">
+        <h1 className="text-xl font-bold text-gray-800">Profile</h1>
+        <button
+          className="text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          onClick={handleHomeClick}
+        >
+          <svg
+            className="h-6 w-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M3 12l9-9 9 9-3 3 6 6-6 6-3-3-9-9z" fill="currentColor" />
+          </svg>
+        </button>
+      </header>
+
+      <main className="flex flex-col space-y-6 px-6 py-10 w-full max-w-3xl">
+        <div className="user-info bg-white shadow-md rounded-lg p-6 flex items-center space-x-6">
+          {/* Profile Picture */}
+          {userDetails.profilePic ? (
+            <img
+              src={userDetails.profilePic}
+              alt={userDetails.name}
+              className="w-24 h-24 rounded-full border"
+            />
+          ) : (
+            <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-gray-500">
+              No Image
             </div>
-          ))
-        ) : (
-          <p>No posts available</p>
-        )}
-      </div>
+          )}
+          {/* User Details */}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">
+              {userDetails.name}
+            </h2>
+            <p className="text-gray-600">
+              {userDetails.followerCount} Followers
+            </p>
+          </div>
+        </div>
+
+        <div className="posts-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => (
+            <div key={post._id} className="bg-white p-4 rounded-lg shadow">
+              <div onClick={() => handlePostClick(post)}>
+                <Post
+                  key={post._id}
+                  postId={post._id}
+                  artistName={post.title}
+                  artistProfile={post.artistProfile}
+                  artworkUrl={post.artworkUrl}
+                  description={post.body}
+                  likeCount={post.like_count}
+                  commentCount={post.comment_count}
+                  token={token}
+                  userID={user?.id || ""}
+                  id={post.id}
+                  comments={commentsMap[post._id] || []}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
     </div>
   );
 };

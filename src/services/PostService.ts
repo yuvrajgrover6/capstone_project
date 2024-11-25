@@ -40,6 +40,28 @@ export const PostService = {
     }
   },
 
+  async uploadImage(
+    postData: { title: string; body: string; artistId: any },
+    token: string
+  ) {
+    const data = { post: postData };
+    try {
+      const response = await axios.post(
+        `${API_URL}/createPost`,
+        JSON.stringify(data),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Failed to create post");
+    }
+  },
+
   // Delete a post
   async deletePost(postId: string, token: string) {
     try {
@@ -99,7 +121,27 @@ export const PostService = {
       );
     }
   },
-
+  async getAllLikes(
+    pageNumber = 1,
+    pageSize = 10,
+    postId: string,
+    token: string
+  ) {
+    try {
+      const response = await axios.get(`${API_URL}/getLikes/${postId}`, {
+        params: { pageNumber, pageSize },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      });
+      return response.data.body;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Failed to get likes data"
+      );
+    }
+  },
   // Add a like to a post
   async addLike(postId: string, userId: string, token: string, id: string) {
     const data = { id, postId, userId };
