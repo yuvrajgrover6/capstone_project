@@ -131,9 +131,13 @@ export const Post: React.FC<PostProps> = ({
       }
     }
   };
-
   return (
     <div className="post bg-white p-4 shadow rounded-lg">
+      <img
+        src={artworkUrl}
+        alt={artistName}
+        className="w-full h-64 object-cover rounded-md"
+      />
       <h2 className="text-xl text-gray-500 font-semibold mt-2">{artistName}</h2>
       <p className="text-lg text-gray-500 mb-4">{description}</p>
       <div className="flex items-center space-x-4 mb-4">

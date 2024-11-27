@@ -1,3 +1,4 @@
+import { Post } from "../components/Post";
 import { apiClient } from "../utils/apiClient"; // Assume you have an apiClient utility to handle the request (axios or fetch)
 
 import axios from "axios";
@@ -37,3 +38,37 @@ export const UserService = {
   //     throw new Error("Failed to fetch user details");
   //   }
 };
+// src/services/profilePicService.ts
+export async function uploadProfilePicture(
+  userId: string,
+  token: string,
+  file: File
+): Promise<string | null> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await axios.post(
+      `${API_URL}upload-profile-pic/${userId}`,
+      { file },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    );
+
+    if (response.status >= 200 && response.status < 300) {
+      const data = await response.data;
+      console.log("Profile picture updated:", data);
+      return data.body?.url || null; // Return the updated URL
+    } else {
+      console.error("Failed to upload profile picture");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error uploading profile picture:", error);
+    return null;
+  }
+}

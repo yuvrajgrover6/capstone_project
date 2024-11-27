@@ -15,7 +15,7 @@ interface PostData {
   comment_count: number;
   artistName: string;
   artistProfile: string;
-  artworkUrl: string;
+  imageUrl: string;
   description: string;
   _id: string;
   userDetails: any;
@@ -140,8 +140,6 @@ export const Feed: React.FC = () => {
     return (
       <div className="container">
         <div className="pt-20 w-full w-screen max-w-screen-lg mx-auto flex place-content-center justify-center item-center space-x-6">
-          {/* <div className="content pt-20 flex justify-center"> */}{" "}
-          {/* Centered content */}
           <div className="w-full lg:w-4/4 space-y-6">
             {selectedPost && (
               <Post
@@ -149,7 +147,7 @@ export const Feed: React.FC = () => {
                 postId={selectedPost._id}
                 artistName={selectedPost.title}
                 artistProfile={selectedPost.artistProfile}
-                artworkUrl={selectedPost.artworkUrl}
+                artworkUrl={selectedPost.imageUrl}
                 description={selectedPost.body}
                 likeCount={selectedPost.like_count}
                 commentCount={selectedPost.comment_count}
@@ -171,7 +169,7 @@ export const Feed: React.FC = () => {
                       postId={post._id}
                       artistName={post.title}
                       artistProfile={post.artistProfile}
-                      artworkUrl={post.artworkUrl}
+                      artworkUrl={post.imageUrl}
                       description={post.body}
                       likeCount={post.like_count}
                       commentCount={post.comment_count}
@@ -315,7 +313,7 @@ export const Feed: React.FC = () => {
               postId={post._id}
               artistName={post.title}
               artistProfile={post.artistProfile}
-              artworkUrl={post.artworkUrl}
+              artworkUrl={post.imageUrl}
               description={post.body}
               likeCount={post.like_count}
               commentCount={post.comment_count}

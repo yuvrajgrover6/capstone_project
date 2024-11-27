@@ -40,18 +40,14 @@ export const PostService = {
     }
   },
 
-  async uploadImage(
-    postData: { title: string; body: string; artistId: any },
-    token: string
-  ) {
-    const data = { post: postData };
+  async uploadImage(postId: string, token: string, file: File) {
     try {
       const response = await axios.post(
-        `${API_URL}/createPost`,
-        JSON.stringify(data),
+        `${API_URL}/upload-post-image/${postId}`,
+        { file },
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
             Authorization: token,
           },
         }

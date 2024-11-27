@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CreatePostModal from "./CreatePostModal";
 import { FaPlus, FaEdit, FaUserCircle } from "react-icons/fa";
+import { uploadProfilePicture } from "../services/UserDetailsService";
 
 interface SidebarProps {
   user: {
@@ -16,6 +17,8 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ user, onPostCreated }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [profilePic, setProfilePic] = useState(user?.profilePicUrl);
+  const [error, setError] = useState<string | null>(null);
 
   const handleCreatePostClick = () => {
     setIsModalOpen(true);
@@ -33,23 +36,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, onPostCreated }) => {
     formData.append("profilePic", file);
 
     try {
-      const response = await fetch(`/api/users/${user.id}/profile-pic`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: formData,
-      });
+      const data = await uploadProfilePicture(user.id, user.token, file);
+      console.log("profilepic", data);
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Profile picture updated:", data);
-        // Update the profile picture URL dynamically here
-      } else {
-        console.error("Failed to upload profile picture");
-      }
-    } catch (error) {
-      console.error("Error uploading profile picture:", error);
+      setProfilePic(data);
+    } catch (err) {
+      setError("Failed to load comments");
     } finally {
       setIsUploading(false);
     }
@@ -101,16 +93,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, onPostCreated }) => {
 
       {/* Sidebar Links */}
       {user?.role === "artist" ? (
-        <ul className="space-y-4">
-          <li>
-            <button
-              onClick={handleCreatePostClick}
-              className="text-blue-600 hover:underline"
-            >
-              Create Post
-            </button>
-          </li>
-        </ul>
+        <div className="flex justify-center">
+          <button
+            onClick={handleCreatePostClick}
+            className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-md"
+            title="Create Post"
+          >
+            <FaPlus className="text-xl" />
+          </button>
+        </div>
       ) : null}
 
       {/* Create Post Modal */}
