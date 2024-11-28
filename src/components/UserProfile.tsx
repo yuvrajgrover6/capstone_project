@@ -8,23 +8,27 @@ import { UserService } from "../services/UserDetailsService";
 interface UserDetails {
   _id: string;
   name: string;
-  profilePic: string;
+  photoUrl: string;
   followerCount: number;
   followingCount: number;
 }
 
 interface PostData {
-  id: string;
-  title: string;
-  body: string;
-  artistId: string;
-  like_count: number;
-  comment_count: number;
-  artistName: string;
-  artistProfile: string;
-  artworkUrl: string;
-  description: string;
-  _id: string;
+  isLikedByUser: boolean;
+  post: {
+    id: string;
+    title: string;
+    body: string;
+    artistId: string;
+    like_count: number;
+    comment_count: number;
+    artistName: string;
+    artistProfile: string;
+    imageUrl: string;
+    description: string;
+    _id: string;
+  };
+  userDetails: any;
 }
 interface CommentsMap {
   [postId: string]: CommentData[];
@@ -77,22 +81,29 @@ export const UserProfile: React.FC = () => {
   }, [token]);
 
   const fetchCommentsForPosts = async (posts: PostData[]) => {
+    console.log("profilepage", posts);
+
     const newCommentsMap: CommentsMap = {};
     for (const post of posts) {
       try {
-        console.log(`Fetching comments for postId: ${post._id}`);
-        const comments = await PostService.getComments(post._id, token); // Fetch comments for each post
-        newCommentsMap[post._id] = comments;
-        console.log(`Comments for postId ${post._id}:`, comments);
+        console.log(`Fetching comments for postId: ${post.post._id}`);
+        const comments = await PostService.getComments(post.post._id, token); // Fetch comments for each post
+        newCommentsMap[post.post._id] = comments;
+        console.log(`Comments for postId ${post.post._id}:`, comments);
       } catch (error) {
-        console.error(`Failed to fetch comments for post ${post._id}`, error);
+        console.error(
+          `Failed to fetch comments for post ${post.post._id}`,
+          error
+        );
       }
     }
     setCommentsMap(newCommentsMap);
     console.log("Updated comments map:", newCommentsMap);
   };
   const handlePostClick = (post: PostData) => {
-    const filteredPosts = posts.filter((p) => p.artistId === post.artistId);
+    const filteredPosts = posts.filter(
+      (p) => p.post.artistId === post.post.artistId
+    );
     navigate("/feed", {
       state: {
         selectedPost: post,
@@ -126,9 +137,9 @@ export const UserProfile: React.FC = () => {
       <main className="flex flex-col space-y-6 px-6 py-10 w-full max-w-3xl">
         <div className="user-info bg-white shadow-md rounded-lg p-6 flex items-center space-x-6">
           {/* Profile Picture */}
-          {userDetails.profilePic ? (
+          {userDetails.photoUrl ? (
             <img
-              src={userDetails.profilePic}
+              src={userDetails.photoUrl}
               alt={userDetails.name}
               className="w-24 h-24 rounded-full border"
             />
@@ -150,21 +161,21 @@ export const UserProfile: React.FC = () => {
 
         <div className="posts-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
-            <div key={post._id} className="bg-white p-4 rounded-lg shadow">
+            <div key={post.post._id} className="bg-white p-4 rounded-lg shadow">
               <div onClick={() => handlePostClick(post)}>
                 <Post
-                  key={post._id}
-                  postId={post._id}
-                  artistName={post.title}
-                  artistProfile={post.artistProfile}
-                  artworkUrl={post.artworkUrl}
-                  description={post.body}
-                  likeCount={post.like_count}
-                  commentCount={post.comment_count}
+                  key={post.post._id}
+                  postId={post.post._id}
+                  artistName={post.post.title}
+                  artistProfile={post.post.artistProfile}
+                  artworkUrl={post.post.imageUrl}
+                  description={post.post.body}
+                  likeCount={post.post.like_count}
+                  commentCount={post.post.comment_count}
                   token={token}
                   userID={user?.id || ""}
-                  id={post.id}
-                  comments={commentsMap[post._id] || []}
+                  id={post.post.id}
+                  comments={commentsMap[post.post._id] || []}
                 />
               </div>
             </div>

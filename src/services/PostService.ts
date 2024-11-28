@@ -11,7 +11,7 @@ export const PostService = {
         params: { pageNumber, pageSize },
         headers: { Authorization: token },
       });
-      return response.data.body.posts;
+      return response.data.body.postsAndLikedStatus;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || "Failed to load posts");
     }

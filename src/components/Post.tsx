@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { PostService } from "../services/PostService";
 import { FaHeart, FaRegHeart, FaComment, FaDonate } from "react-icons/fa";
+import { PaymentPage } from "./Payment";
+import { ConfirmationPopup } from "./PaymentConfirmationPopup";
+import { useNavigate } from "react-router-dom";
 
 interface PostProps {
   postId: string;
@@ -47,6 +50,24 @@ export const Post: React.FC<PostProps> = ({
   const [newComment, setNewComment] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showComments, setShowComments] = useState(false); // State for toggling comment visibility
+  const [showPaymentPage, setShowPaymentPage] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleFundClick = () => {
+    navigate(`/payment/${postId}`);
+  };
+
+  const handleConfirmPayment = () => {
+    setShowPaymentPage(false);
+    setShowConfirmation(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentPage(false);
+    alert("Payment successful!");
+  };
 
   // Fetch comments from API
   const fetchComments = async (pageNumber = 1, pageSize = 10) => {
@@ -57,25 +78,26 @@ export const Post: React.FC<PostProps> = ({
         pageNumber,
         pageSize
       );
-      setPostComments(data); // Update the state with fetched comments
+      setPostComments(data);
+      // Update the state with fetched comments
     } catch (err) {
       setError("Failed to load comments");
     }
   };
-  // Fetch Likes details from API
-  const getAllLikes = async (pageNumber = 1, pageSize = 10) => {
-    try {
-      const data = await PostService.getAllLikes(
-        pageNumber,
-        pageSize,
-        postId,
-        token
-      );
-      setlikeDetails(data); // Update the state with fetched comments
-    } catch (err) {
-      setError("Failed to load comments");
-    }
-  };
+  // // Fetch Likes details from API
+  // const getAllLikes = async (pageNumber = 1, pageSize = 10) => {
+  //   try {
+  //     const data = await PostService.getAllLikes(
+  //       pageNumber,
+  //       pageSize,
+  //       postId,
+  //       token
+  //     );
+  //     setlikeDetails(data); // Update the state with fetched comments
+  //   } catch (err) {
+  //     setError("Failed to load comments");
+  //   }
+  // };
 
   // Check if the user has already liked this post
 
@@ -87,9 +109,7 @@ export const Post: React.FC<PostProps> = ({
         postId,
         token
       );
-      console.log("likw", data);
-
-      setIsLiked(data.isLikedByUser);
+      console.log("like", data);
     } catch {
       setError("Failed to check like status");
     }
@@ -158,9 +178,28 @@ export const Post: React.FC<PostProps> = ({
         </span>
 
         {/* Fund Button */}
-        <span className="cursor-pointer text-green-500">
+        <span
+          onClick={handleFundClick}
+          className="cursor-pointer text-green-500"
+        >
           <FaDonate /> Fund
         </span>
+        {showConfirmation && (
+          <ConfirmationPopup
+            message="Are you sure you want to proceed to payment?"
+            onConfirm={handleConfirmPayment}
+            onCancel={() => setShowConfirmation(false)}
+          />
+        )}
+
+        {/* {showPaymentPage && (
+          <PaymentPage
+            postId={postId}
+            userId={userID}
+            token={token}
+            onPaymentSuccess={handlePaymentSuccess}
+          />
+        )} */}
       </div>
 
       {/* Display comment input and comments conditionally */}

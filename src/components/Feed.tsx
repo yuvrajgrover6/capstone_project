@@ -7,17 +7,20 @@ import { UserService } from "../services/UserDetailsService";
 import { FaUserCircle } from "react-icons/fa";
 
 interface PostData {
-  id: string;
-  title: string;
-  body: string;
-  artistId: string;
-  like_count: number;
-  comment_count: number;
-  artistName: string;
-  artistProfile: string;
-  imageUrl: string;
-  description: string;
-  _id: string;
+  isLikedByUser: boolean;
+  post: {
+    id: string;
+    title: string;
+    body: string;
+    artistId: string;
+    like_count: number;
+    comment_count: number;
+    artistName: string;
+    artistProfile: string;
+    imageUrl: string;
+    description: string;
+    _id: string;
+  };
   userDetails: any;
 }
 
@@ -42,7 +45,7 @@ export const Feed: React.FC = () => {
   const token = user?.token || "";
   const location = useLocation();
   const { selectedPost, filteredPosts } = location.state || {};
-
+  console.log("selectedPost", selectedPost);
   // const fetchPosts = async (pageNumber = 1, pageSize = 10) => {
   //   try {
   //     setLoading(true);
@@ -136,25 +139,25 @@ export const Feed: React.FC = () => {
   //   }));
   // }
 
-  if (selectedPost) {
+  if (selectedPost?.post) {
     return (
       <div className="container">
         <div className="pt-20 w-full w-screen max-w-screen-lg mx-auto flex place-content-center justify-center item-center space-x-6">
           <div className="w-full lg:w-4/4 space-y-6">
-            {selectedPost && (
+            {selectedPost?.post && (
               <Post
-                key={selectedPost._id}
-                postId={selectedPost._id}
-                artistName={selectedPost.title}
-                artistProfile={selectedPost.artistProfile}
-                artworkUrl={selectedPost.imageUrl}
-                description={selectedPost.body}
-                likeCount={selectedPost.like_count}
-                commentCount={selectedPost.comment_count}
+                key={selectedPost.post._id}
+                postId={selectedPost.post._id}
+                artistName={selectedPost.post.title}
+                artistProfile={selectedPost.post.artistProfile}
+                artworkUrl={selectedPost.post.imageUrl}
+                description={selectedPost.post.body}
+                likeCount={selectedPost.post.like_count}
+                commentCount={selectedPost.post.comment_count}
                 token={token}
                 userID={user?.id || ""}
-                id={selectedPost.id}
-                comments={commentsMap[selectedPost._id] || []}
+                id={selectedPost.post.id}
+                comments={commentsMap[selectedPost.post._id] || []}
               />
             )}
 
@@ -162,21 +165,23 @@ export const Feed: React.FC = () => {
               <>
                 <h2>Other Posts from {selectedPost.name}</h2>
                 {filteredPosts
-                  .filter((post: PostData) => post._id !== selectedPost._id)
+                  .filter(
+                    (post: PostData) => post.post._id !== selectedPost._id
+                  )
                   .map((post: PostData) => (
                     <Post
-                      key={post._id}
-                      postId={post._id}
-                      artistName={post.title}
-                      artistProfile={post.artistProfile}
-                      artworkUrl={post.imageUrl}
-                      description={post.body}
-                      likeCount={post.like_count}
-                      commentCount={post.comment_count}
+                      key={post.post._id}
+                      postId={post.post._id}
+                      artistName={post.post.title}
+                      artistProfile={post.post.artistProfile}
+                      artworkUrl={post.post.imageUrl}
+                      description={post.post.body}
+                      likeCount={post.post.like_count}
+                      commentCount={post.post.comment_count}
                       token={token}
                       userID={user?.id || ""}
-                      id={post.id}
-                      comments={commentsMap[post._id] || []}
+                      id={post.post.id}
+                      comments={commentsMap[post.post._id] || []}
                     />
                   ))}
               </>
@@ -205,8 +210,9 @@ export const Feed: React.FC = () => {
 
         await fetchCommentsForPosts(fetchedPosts); // Fetch comments after posts
         // Fetch user details
+        console.log("fetchpost", fetchedPosts);
         const uniqueArtistIds = [
-          ...new Set(fetchedPosts.map((post) => post.artistId)),
+          ...new Set(fetchedPosts.map((post) => post.post.artistId)),
         ];
         const userDetailsMap: { [id: string]: any } = {};
 
@@ -231,7 +237,7 @@ export const Feed: React.FC = () => {
         // Combine posts with user details
         const enhancedPosts = fetchedPosts.map((post) => ({
           ...post,
-          userDetails: userDetailsMap[post.artistId] || null,
+          userDetails: userDetailsMap[post.post.artistId] || null,
         }));
 
         setPosts(enhancedPosts);
@@ -250,12 +256,15 @@ export const Feed: React.FC = () => {
     const newCommentsMap: CommentsMap = {};
     for (const post of posts) {
       try {
-        console.log(`Fetching comments for postId: ${post._id}`);
-        const comments = await PostService.getComments(post._id, token); // Fetch comments for each post
-        newCommentsMap[post._id] = comments;
-        console.log(`Comments for postId ${post._id}:`, comments);
+        console.log(`Fetching comments for postId: ${post.post._id}`);
+        const comments = await PostService.getComments(post.post._id, token); // Fetch comments for each post
+        newCommentsMap[post.post._id] = comments;
+        console.log(`Comments for postId ${post.post._id}:`, comments);
       } catch (error) {
-        console.error(`Failed to fetch comments for post ${post._id}`, error);
+        console.error(
+          `Failed to fetch comments for post ${post.post._id}`,
+          error
+        );
       }
     }
     setCommentsMap(newCommentsMap);
@@ -283,9 +292,9 @@ export const Feed: React.FC = () => {
         posts.map((post) => (
           <>
             <div className="flex items-center space-x-4 mb-6">
-              {post.userDetails?.profilePic ? (
+              {post.userDetails?.photoUrl ? (
                 <img
-                  src={post.userDetails.profilePic}
+                  src={post.userDetails.photoUrl}
                   alt={post.userDetails?.name || "Artist"}
                   className="w-12 h-12 rounded-full"
                 />
@@ -297,7 +306,9 @@ export const Feed: React.FC = () => {
                   to={`/profile/${post.userDetails._id}`}
                   state={{
                     userDetails: post.userDetails,
-                    posts: posts.filter((p) => p.artistId === post.artistId),
+                    posts: posts.filter(
+                      (p) => p.post.artistId === post.post.artistId
+                    ),
                   }}
                   className="font-semibold text-xl"
                 >
@@ -309,18 +320,18 @@ export const Feed: React.FC = () => {
             </div>
 
             <Post
-              key={post._id}
-              postId={post._id}
-              artistName={post.title}
-              artistProfile={post.artistProfile}
-              artworkUrl={post.imageUrl}
-              description={post.body}
-              likeCount={post.like_count}
-              commentCount={post.comment_count}
+              key={post.post._id}
+              postId={post.post._id}
+              artistName={post.post.title}
+              artistProfile={post.post.artistProfile}
+              artworkUrl={post.post.imageUrl}
+              description={post.post.body}
+              likeCount={post.post.like_count}
+              commentCount={post.post.comment_count}
               token={token}
               userID={user?.id || ""}
-              id={post.id}
-              comments={commentsMap[post._id] || []} // Pass comments for each post
+              id={post.post.id}
+              comments={commentsMap[post.post._id] || []} // Pass comments for each post
             />
           </>
         ))
