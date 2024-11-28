@@ -2,6 +2,19 @@
 import axios from "axios";
 const API_URL = "http://localhost:3000/payment";
 
+interface IPayment {
+  id: number;
+  amount: number;
+  currency: string;
+  status: string;
+  donationId: string;
+  userId: string;
+  paymentMethod: string;
+  paymentDetails: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export const PaymentService = {
   async createPayment(paymentData: {
     amount: number;
@@ -18,10 +31,32 @@ export const PaymentService = {
     bankName?: string;
     routingNumber?: string;
   }) {
+    const transaction: IPayment = {
+      id: 0,
+      amount: paymentData.amount,
+      currency: paymentData.currency,
+      status: "pending",
+      donationId: paymentData.donationId,
+      userId: paymentData.userId,
+      paymentMethod: paymentData.paymentMethod,
+      paymentDetails:
+        paymentData.paymentMethod === "credit_card"
+          ? paymentData.cardNumber || ""
+          : paymentData.paymentMethod === "paypal"
+          ? paymentData.paypalEmail || ""
+          : paymentData.accountNumber || "",
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+
     const { token, ...data } = paymentData;
-    const response = await axios.post(`${API_URL}/createTransaction`, data, {
-      headers: { Authorization: token },
-    });
+    const response = await axios.post(
+      `${API_URL}/createTransaction`,
+      { transaction },
+      {
+        headers: { Authorization: token },
+      }
+    );
     return response.data;
   },
 };
