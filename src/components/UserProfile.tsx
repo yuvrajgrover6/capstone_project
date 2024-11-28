@@ -165,6 +165,7 @@ export const UserProfile: React.FC = () => {
               <div onClick={() => handlePostClick(post)}>
                 <Post
                   key={post.post._id}
+                  isLikedByUser={post.isLikedByUser}
                   postId={post.post._id}
                   artistName={post.post.title}
                   artistProfile={post.post.artistProfile}

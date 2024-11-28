@@ -59,25 +59,34 @@ export const PaymentService = {
     );
     return response.data;
   },
+  async getUserTransaction(token: string) {
+    try {
+      const response = await axios.get(
+        `${API_URL}/userTransaction`,
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Failed to create post");
+    }
+  },
+
+  async getAllTransaction(pageNumber = 1, pageSize = 10, token: string) {
+    try {
+      const response = await axios.get(`${API_URL}/transaction`, {
+        params: { pageNumber, pageSize },
+        headers: { Authorization: token },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || "Failed to create post");
+    }
+  },
 };
-//  async createPost(
-//     postData: { title: string; body: string; artistId: any },
-//     token: string
-//   ) {
-//     const data = { post: postData };
-//     try {
-//       const response = await axios.post(
-//         `${API_URL}/createPost`,
-//         JSON.stringify(data),
-//         {
-//           headers: {
-//             "Content-Type": "application/json",
-//             Authorization: token,
-//           },
-//         }
-//       );
-//       return response.data;
-//     } catch (error: any) {
-//       throw new Error(error.response?.data?.message || "Failed to create post");
-//     }
-//   },

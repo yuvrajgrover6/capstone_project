@@ -147,6 +147,7 @@ export const Feed: React.FC = () => {
             {selectedPost?.post && (
               <Post
                 key={selectedPost.post._id}
+                isLikedByUser={selectedPost.post.isLikedByUser}
                 postId={selectedPost.post._id}
                 artistName={selectedPost.post.title}
                 artistProfile={selectedPost.post.artistProfile}
@@ -171,6 +172,7 @@ export const Feed: React.FC = () => {
                   .map((post: PostData) => (
                     <Post
                       key={post.post._id}
+                      isLikedByUser={post.isLikedByUser}
                       postId={post.post._id}
                       artistName={post.post.title}
                       artistProfile={post.post.artistProfile}
@@ -241,6 +243,7 @@ export const Feed: React.FC = () => {
         }));
 
         setPosts(enhancedPosts);
+        console.log("likecheck", posts);
       } catch (error) {
         setError("Failed to load posts or user details");
       } finally {
@@ -321,6 +324,7 @@ export const Feed: React.FC = () => {
 
             <Post
               key={post.post._id}
+              isLikedByUser={post.isLikedByUser}
               postId={post.post._id}
               artistName={post.post.title}
               artistProfile={post.post.artistProfile}

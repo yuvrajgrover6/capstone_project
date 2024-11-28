@@ -30,17 +30,33 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose }) => {
       const response = await login(formData); // Call login service and get user data
       console.log("response", response);
       // Set user data and token in context
-      setUser({
-        name: response.body.user.name,
-        email: response.body.user.email,
-        profilePicUrl: response.body.user.photoUrl || "/default-profile.jpg", // Use a default if photoUrl is empty
-        role: response.body.user.type,
-        id: response.body.user._id,
-        token: response.body.token,
-      });
+      if (response.body.user) {
+        setUser({
+          name: response.body.user.name,
+          email: response.body.user.email,
+          profilePicUrl: response.body.user.photoUrl || "/default-profile.jpg", // Use a default if photoUrl is empty
+          role: response.body.user.type,
+          id: response.body.user._id,
+          token: response.body.token,
+        });
+      } else {
+        setUser({
+          name: response.body.admin.name,
+          email: response.body.admin.email,
+          profilePicUrl:
+            response?.body?.admin?.photoUrl || "/default-profile.jpg", // Use a default if photoUrl is empty
+          role: "admin",
+          id: response.body.admin._id,
+          token: response.body.token,
+        });
+      }
 
       onClose(); // Close the login modal
-      navigate("/home"); // Redirect to the home page
+      if (response?.body?.admin) {
+        navigate("/admin"); // Redirect to the home page
+      } else {
+        navigate("/home"); // Redirect to the home page
+      }
     } catch (error: any) {
       setError(error.message);
     } finally {

@@ -6,6 +6,7 @@ import { UserProvider } from "./context/UserContext";
 import { UserProfile } from "./components/UserProfile";
 import { Feed } from "./components/Feed";
 import { PaymentPage } from "./components/Payment";
+import { AdminPage } from "./components/AdminPage";
 // import { getToken } from "./services/AuthService";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/profile/:userId" element={<UserProfile />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/payment/:postId" element={<PaymentPage />} />
+          <Route path="/admin" element={<AdminPage />} />
 
           {/* <Route
           path="/feed"

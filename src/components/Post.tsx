@@ -5,8 +5,10 @@ import { FaHeart, FaRegHeart, FaComment, FaDonate } from "react-icons/fa";
 import { PaymentPage } from "./Payment";
 import { ConfirmationPopup } from "./PaymentConfirmationPopup";
 import { useNavigate } from "react-router-dom";
+import { PaymentService } from "../services/PaymentService";
 
 interface PostProps {
+  isLikedByUser: boolean;
   postId: string;
   artistName: string;
   artistProfile: string;
@@ -17,8 +19,8 @@ interface PostProps {
   token: string;
   userID: string;
   id: string;
-  comments: CommentData[]; // Initial comments prop
-}
+  comments: CommentData[];
+} // Initial comments prop
 
 interface CommentData {
   _id: string;
@@ -30,6 +32,7 @@ interface CommentData {
 interface LikeData {}
 
 export const Post: React.FC<PostProps> = ({
+  isLikedByUser,
   postId,
   artistName,
   artistProfile,
@@ -101,15 +104,10 @@ export const Post: React.FC<PostProps> = ({
 
   // Check if the user has already liked this post
 
-  const checkLikedStatus = async (pageNumber = 1, pageSize = 10) => {
+  const getUserTransaction = async () => {
     try {
-      const data = await PostService.getAllLikes(
-        pageNumber,
-        pageSize,
-        postId,
-        token
-      );
-      console.log("like", data);
+      const data = await PaymentService.getUserTransaction(token);
+      console.log("transaction", data);
     } catch {
       setError("Failed to check like status");
     }
@@ -118,7 +116,10 @@ export const Post: React.FC<PostProps> = ({
   // Fetch comments initially when component mounts
   useEffect(() => {
     fetchComments(1, 10);
-    checkLikedStatus();
+    // checkLikedStatus();
+    console.log("isLikedByUser", isLikedByUser);
+    setIsLiked(isLikedByUser);
+    getUserTransaction();
   }, [postId, token]);
 
   const handleLikeToggle = async () => {
