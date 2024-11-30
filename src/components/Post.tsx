@@ -29,7 +29,11 @@ interface CommentData {
   userId: string;
 }
 
-interface LikeData {}
+interface LikeData {
+  _id: string;
+  postId: string;
+  userId: string;
+}
 
 export const Post: React.FC<PostProps> = ({
   isLikedByUser,
@@ -48,7 +52,7 @@ export const Post: React.FC<PostProps> = ({
   const [likes, setLikes] = useState(likeCount);
   const [isLiked, setIsLiked] = useState(false);
   const [postComments, setPostComments] = useState<CommentData[]>(comments);
-  const [likeDetails, setlikeDetails] = useState<LikeData[]>(comments);
+  const [likeDetails, setlikeDetails] = useState<LikeData[]>();
 
   const [newComment, setNewComment] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -87,20 +91,21 @@ export const Post: React.FC<PostProps> = ({
       setError("Failed to load comments");
     }
   };
-  // // Fetch Likes details from API
-  // const getAllLikes = async (pageNumber = 1, pageSize = 10) => {
-  //   try {
-  //     const data = await PostService.getAllLikes(
-  //       pageNumber,
-  //       pageSize,
-  //       postId,
-  //       token
-  //     );
-  //     setlikeDetails(data); // Update the state with fetched comments
-  //   } catch (err) {
-  //     setError("Failed to load comments");
-  //   }
-  // };
+  // Fetch Likes details from API
+  const getAllLikes = async (pageNumber = 1, pageSize = 10) => {
+    try {
+      const data = await PostService.getAllLikes(
+        pageNumber,
+        pageSize,
+        postId,
+        token
+      );
+      console.log("likkkeeekekek", likeDetails);
+      setlikeDetails(data); // Update the state with fetched comments
+    } catch (err) {
+      setError("Failed to load comments");
+    }
+  };
 
   // Check if the user has already liked this post
 
@@ -118,14 +123,22 @@ export const Post: React.FC<PostProps> = ({
     fetchComments(1, 10);
     // checkLikedStatus();
     console.log("isLikedByUser", isLikedByUser);
+    getAllLikes(1, 10);
     setIsLiked(isLikedByUser);
     getUserTransaction();
   }, [postId, token]);
 
-  const handleLikeToggle = async () => {
+  const handleLikeToggle = async (postId: string) => {
+    console.log("likepostid", postId);
+
     try {
       if (isLiked) {
-        await PostService.removeLike(postId, token);
+        const like = likeDetails?.find((like) => like.postId === postId);
+        if (!like) {
+          throw new Error("Like not found for the post");
+        }
+
+        await PostService.removeLike(like._id, token);
         setLikes(likes - 1);
       } else {
         await PostService.addLike(postId, userID, token, id);
@@ -164,7 +177,9 @@ export const Post: React.FC<PostProps> = ({
       <div className="flex items-center space-x-4 mb-4">
         {/* Like Button */}
         <span
-          onClick={handleLikeToggle}
+          onClick={() => {
+            handleLikeToggle(postId);
+          }}
           className="cursor-pointer text-red-500"
         >
           {isLiked ? <FaHeart /> : <FaRegHeart />} ({likes})

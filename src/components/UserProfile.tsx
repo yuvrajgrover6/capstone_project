@@ -3,6 +3,7 @@ import { Post } from "./Post";
 import React, { useEffect, useState } from "react";
 import { PostService } from "../services/PostService";
 import { useUser } from "../context/UserContext";
+import { FaHome } from "react-icons/fa";
 import { UserService } from "../services/UserDetailsService";
 
 interface UserDetails {
@@ -120,17 +121,10 @@ export const UserProfile: React.FC = () => {
       <header className="flex items-center justify-between w-full px-6 py-4 bg-white shadow-md">
         <h1 className="text-xl font-bold text-gray-800">Profile</h1>
         <button
-          className="text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="text-white-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           onClick={handleHomeClick}
         >
-          <svg
-            className="h-6 w-6"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M3 12l9-9 9 9-3 3 6 6-6 6-3-3-9-9z" fill="currentColor" />
-          </svg>
+          <FaHome className="h-6 w-6" />
         </button>
       </header>
 

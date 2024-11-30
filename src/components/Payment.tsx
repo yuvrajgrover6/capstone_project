@@ -26,6 +26,7 @@ export const PaymentPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   // Handle payment submission
   const handlePayment = async () => {
@@ -83,8 +84,11 @@ export const PaymentPage: React.FC = () => {
       }
 
       await PaymentService.createPayment(paymentData);
-      alert("Payment successful!");
-      navigate("/"); // Redirect after payment
+      setShowSuccessPopup(true); // Show the success popup
+      setTimeout(() => {
+        setShowSuccessPopup(false); // Auto-hide the popup after a few seconds
+        navigate("/home"); // Redirect after payment
+      }, 3000);
     } catch (err) {
       setError("Payment failed. Please try again.");
     } finally {
@@ -203,43 +207,60 @@ export const PaymentPage: React.FC = () => {
 
   return (
     <div className="payment-page w-screen mx-auto bg-gray-100 min-h-screen flex items-center justify-center">
-      <div className="bg-white p-8 shadow-md rounded-md w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">Make a Payment</h2>
-        <div className="relative mb-4">
-          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
-            $
-          </span>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) =>
-              setAmount(e.target.value ? Number(e.target.value) : "")
-            }
-            placeholder="Enter amount"
-            className="w-full border p-2 pl-8 rounded"
-            min="0"
-            step="0.01"
-          />
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded shadow-lg text-center">
+            <h2 className="text-2xl font-bold text-green-500">
+              Payment Successful!
+            </h2>
+            <p className="text-gray-700 mt-2">Thank you for your support!</p>
+          </div>
         </div>
-        <select
-          value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
-          className="w-full border p-2 rounded mb-4"
-        >
-          <option value="credit_card">Credit Card</option>
-          <option value="paypal">PayPal</option>
-          <option value="bank_transfer">Bank Transfer</option>
-        </select>
-        {renderPaymentFields()}
-        <button
-          onClick={handlePayment}
-          disabled={isProcessing}
-          className="bg-green-500 text-white px-4 py-2 rounded w-full"
-        >
-          {isProcessing ? "Processing..." : "Pay Now"}
-        </button>
-        {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
-      </div>
+      )}
+
+      {/* Payment Form */}
+      {!showSuccessPopup && (
+        <div className="bg-white p-8 shadow-md rounded-md w-full max-w-lg">
+          <h2 className="text-2xl font-bold mb-6 text-center">
+            Make a Payment
+          </h2>
+          <div className="relative mb-4">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+              $
+            </span>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) =>
+                setAmount(e.target.value ? Number(e.target.value) : "")
+              }
+              placeholder="Enter amount"
+              className="w-full border p-2 pl-8 rounded"
+              min="0"
+              step="0.01"
+            />
+          </div>
+          <select
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            className="w-full border p-2 rounded mb-4"
+          >
+            <option value="credit_card">Credit Card</option>
+            <option value="paypal">PayPal</option>
+            <option value="bank_transfer">Bank Transfer</option>
+          </select>
+          {renderPaymentFields()}
+          <button
+            onClick={handlePayment}
+            disabled={isProcessing}
+            className="bg-green-500 text-white px-4 py-2 rounded w-full"
+          >
+            {isProcessing ? "Processing..." : "Pay Now"}
+          </button>
+          {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
+        </div>
+      )}
     </div>
   );
 };
